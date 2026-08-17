@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Find Blood Donors</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { display: flex; background-color: maroon; color: #000000; min-height: 100vh; overflow-x: hidden; }
+    .sidebar { width: 260px; background-color: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; transition: width 0.3s ease; position: sticky; top: 0; height: 100vh; z-index: 100; }
+    .sidebar.collapsed { width: 70px; }
+    .sidebar-header { padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e0e0; }
+    .toggle-btn { background: none; border: 1px solid #000000; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+    .nav-list { list-style: none; padding: 10px 0; flex: 1; overflow-y: auto; }
+    .nav-item a { display: flex; align-items: center; padding: 14px 20px; color: #000000; text-decoration: none; font-weight: 500; white-space: nowrap; }
+    .nav-item a:hover, .nav-item.active a { background-color: maroon; color: white; padding-left: 25px; }
+    .nav-icon { margin-right: 15px; font-size: 1.2rem; min-width: 24px; text-align: center; }
+    .sidebar.collapsed .nav-text, .sidebar.collapsed .brand-name { display: none; }
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; width: calc(100% - 260px); }
+    .top-banner { background-color: #ffffff; border-bottom: 2px solid #000000; padding: 20px 40px; text-align: center; }
+    .top-banner h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: 1px; }
+    .content-container { padding: 30px 40px; display: flex; flex-direction: column; gap: 25px; }
+    .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; }
+    .filter-select, .search-input { padding: 12px 16px; font-size: 1rem; border: 2px solid #000000; border-radius: 6px; outline: none; background-color: #ffffff; }
+    .search-input { flex: 1; min-width: 250px; }
+    .filter-select { cursor: pointer; min-width: 160px; }
+    .donor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 10px; }
+    .donor-card { background-color: #ffffff; border: 2px solid #000000; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .donor-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); }
+    .donor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; }
+    .donor-name { font-size: 1.25rem; font-weight: 700; }
+    .blood-badge { background-color: #000000; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 1rem; }
+    .donor-details { font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px; }
+    .status-indicator { display: inline-block; padding: 4px 8px; font-size: 0.85rem; font-weight: 700; border: 1px solid #000000; border-radius: 4px; margin-bottom: 15px; background-color: #f0f0f0; }
+    .action-btn { width: 100%; padding: 10px; font-size: 0.95rem; font-weight: 600; border: 2px solid #000000; background-color: #ffffff; color: #000000; border-radius: 6px; cursor: pointer; margin-top: 5px; }
+    .action-btn:hover { background-color: #000000; color: #ffffff; }
+    .toggle-status-btn { background-color: #f0f0f0; border-color: #000000; }
+    .toggle-status-btn:hover { background-color: #e0e0e0; color: #000000; }
+    .delete-btn { background-color: #d9534f; color: #ffffff; border-color: #d9534f; }
+    .delete-btn:hover { background-color: #a94442; color: #ffffff; }
+    .no-results { grid-column: 1 / -1; text-align: center; padding: 40px; font-size: 1.1rem; border: 2px dashed #000000; border-radius: 8px; display: none; color: white; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item active"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-banner"><h1>LifeLink 🩸</h1></header>
+    <main class="content-container">
+      <div class="page-title"><h2 style="color:white">👥 Find Registered Donors</h2></div>
+
+      <div class="filter-bar">
+        <select id="bloodGroupFilter" class="filter-select" onchange="filterDonors()">
+          <option value="">All Blood Groups</option>
+          <option value="A+">A+</option><option value="A-">A-</option>
+          <option value="B+">B+</option><option value="B-">B-</option>
+          <option value="O+">O+</option><option value="O-">O-</option>
+          <option value="AB+">AB+</option><option value="AB-">AB-</option>
+        </select>
+        <input type="text" id="locationSearch" class="search-input" placeholder="Search locality..." onkeyup="filterDonors()">
+      </div>
+
+      <div class="donor-grid" id="donorGrid">
+        <div class="no-results" id="noResults">No donors matching the specified criteria were found.</div>
+      </div>
+    </main>
+  </div>
+  
+
+<script>
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+  async function fetchAndRenderDonors() {
+    try {
+      const response = await fetch('http://localhost:3000/api/donors');
+      const donors = await response.json();
+      
+      const donorGrid = document.getElementById('donorGrid');
+      const currentDonorId = localStorage.getItem('currentDonorId');
+
+      donorGrid.innerHTML = `
+        <div class="no-results" id="noResults" style="display: none;">
+          No donors matching the specified criteria were found.
+        </div>
+      `;
+
+      if (donors.length === 0) {
+        document.getElementById('noResults').style.display = 'block';
+        return;
+      }
+
+      donors.forEach(donor => {
+        const card = document.createElement('div');
+        card.className = 'donor-card';
+        card.setAttribute('data-bg', donor.bloodGroup);
+        card.setAttribute('data-location', donor.location);
+
+        const isOwner = currentDonorId === donor.id;
+        const currentStatus = donor.availability || 'Available';
+        const isAvailable = currentStatus === 'Available';
+
+        card.innerHTML = `
+          <div>
+            <div class="donor-header">
+              <span class="donor-name">${donor.name}</span>
+              <span class="blood-badge">${donor.bloodGroup}</span>
+            </div>
+            <div class="donor-details">
+              <div>📍 <strong>Location:</strong> ${donor.location}</div>
+              <div>📞 <strong>Contact:</strong> ${donor.contact}</div>
+              <div>📝 <strong>Notes:</strong> ${donor.notes || 'None'}</div>
+            </div>
+            <div class="status-indicator">${isAvailable ? '✅ Available' : '❌ Unavailable'}</div>
+          </div>
+          <div>
+            ${isOwner ? `
+              <button class="action-btn toggle-status-btn" onclick="toggleAvailability('${donor.id}', '${currentStatus}')">
+                Mark as ${isAvailable ? 'Unavailable' : 'Available'}
+              </button>
+              <button class="action-btn delete-btn" onclick="deleteProfile('${donor.id}')">Delete My Profile</button>
+            ` : `
+              <button class="action-btn">Request Donation</button>
+            `}
+          </div>
+        `;
+
+        donorGrid.appendChild(card);
+      });
+
+      filterDonors();
+    } catch (error) {
+      console.error('Error loading donors from server:', error);
+    }
+  }
+
+  async function toggleAvailability(donorId, currentStatus) {
+    const newStatus = currentStatus === 'Available' ? 'Unavailable' : 'Available';
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/donors/${donorId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ availability: newStatus })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        fetchAndRenderDonors();
+      } else {
+        alert(data.message || 'Failed to update status.');
+      }
+    } catch (err) {
+      console.error('Status toggle error:', err);
+      alert('Server error while updating status.');
+    }
+  }
+
+  async function deleteProfile(donorId) {
+    if (!confirm('Are you sure you want to delete your donor profile?')) return;
+
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/donors/${donorId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Profile deleted successfully!');
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentDonorId');
+        fetchAndRenderDonors();
+      } else {
+        alert(data.message || 'Failed to delete profile.');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Server error while deleting profile.');
+    }
+  }
+
+  function filterDonors() {
+    const bgFilter = document.getElementById('bloodGroupFilter').value.toLowerCase();
+    const locationInput = document.getElementById('locationSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.donor-card');
+    const noResults = document.getElementById('noResults');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const bg = card.getAttribute('data-bg').toLowerCase();
+      const location = card.getAttribute('data-location').toLowerCase();
+
+      const matchesBg = bgFilter === '' || bg === bgFilter;
+      const matchesLoc = location.includes(locationInput);
+
+      if (matchesBg && matchesLoc) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', fetchAndRenderDonors);
+</script>
+</body>
+</html>

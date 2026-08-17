@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Leave a Review</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: #800000; /* Maroon background */
+      color: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color: maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* CONTENT CONTAINER */
+    .content-container {
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+
+    /* ATTRACTIVE REVIEW CARD STYLING */
+    .card {
+      border: 2px solid #000000;
+      background-color: #FAF0E6;
+      width: 450px;
+      padding: 32px;
+      border-radius: 28px;
+      box-shadow: 6px 12px #000000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+    .card:hover {
+      background-color: #FFFFFF;
+      transform: translateY(-6px);
+      box-shadow: 10px 18px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .card h2 {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 1.6rem;
+    }
+
+    .sub-title {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #555555;
+      margin-bottom: 24px;
+    }
+
+    /* STAR RATING COMPONENT */
+    .star-rating-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .star-rating-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stars {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .stars input {
+      display: none;
+    }
+
+    .stars label {
+      font-size: 2.2rem;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.15s ease;
+    }
+
+    .stars label:hover,
+    .stars label:hover ~ label,
+    .stars input:checked ~ label {
+      color: #ffb703;
+      transform: scale(1.15);
+    }
+
+    /* FIELD GROUPS */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 14px;
+    }
+
+    .field-group label {
+      font-weight: bold;
+      font-size: 12px;
+      margin-bottom: 5px;
+      color: #000000;
+    }
+
+    .field-group input, 
+    .field-group select, 
+    .field-group textarea {
+      background-color: #ffffff;
+      border: 1.5px solid #000000;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field-group input:focus, 
+    .field-group select:focus, 
+    .field-group textarea:focus {
+      border-color: #800000;
+      box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.15);
+    }
+
+    .field-group textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
+
+    /* TAG PILLS */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tag-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background-color: #ffffff;
+      border: 1px solid #000000;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .tag-pill.selected {
+      background-color: #800000;
+      color: #ffffff;
+      border-color: #800000;
+    }
+
+    .error-message {
+      color: #d9534f;
+      font-size: 11px;
+      margin-top: 3px;
+      min-height: 14px;
+    }
+
+    /* BUTTON STYLING */
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    .btn-submit {
+      background-color: #F3E2D3;
+      font-weight: bold;
+      border: 2px solid #000000;
+      color: #000000;
+      border-radius: 10px;
+      padding: 10px 28px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #000000;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .success-message {
+      color: #2b8a3e;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item active"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <!-- REVIEW CARD -->
+      <div class="card">
+        <h2>LEAVE A REVIEW</h2>
+        <p class="sub-title">Your feedback helps us improve and save more lives.</p>
+
+        <form id="reviewForm" onsubmit="submitReview(event)">
+
+          <!-- STAR RATING -->
+          <div class="star-rating-wrapper">
+            <span class="star-rating-label">Rate Your Experience</span>
+            <div class="stars">
+              <input type="radio" id="star5" name="rating" value="5" />
+              <label for="star5" title="5 stars">★</label>
+              
+              <input type="radio" id="star4" name="rating" value="4" />
+              <label for="star4" title="4 stars">★</label>
+              
+              <input type="radio" id="star3" name="rating" value="3" />
+              <label for="star3" title="3 stars">★</label>
+              
+              <input type="radio" id="star2" name="rating" value="2" />
+              <label for="star2" title="2 stars">★</label>
+              
+              <input type="radio" id="star1" name="rating" value="1" />
+              <label for="star1" title="1 star">★</label>
+            </div>
+            <span class="error-message" id="ratingError"></span>
+          </div>
+
+          <!-- USER ROLE / EXPERIENCE -->
+          <div class="field-group">
+            <label>WHAT WAS YOUR EXPERIENCE RELATED TO?</label>
+            <div class="tags-container" id="tagGroup">
+              <span class="tag-pill" onclick="toggleTag(this)">Emergency Request</span>
+              <span class="tag-pill" onclick="toggleTag(this)">Donor Registration</span>
+              <span class="tag-pill" onclick="toggleTag(this)">Blood Bank Lookup</span>
+              <span class="tag-pill" onclick="toggleTag(this)">Platform Usability</span>
+            </div>
+          </div>
+
+          <!-- FULL NAME -->
+          <div class="field-group">
+            <label for="reviewerName">YOUR NAME:</label>
+            <input type="text" id="reviewerName" placeholder="e.g., Alex Morgan">
+            <span class="error-message" id="nameError"></span>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="field-group">
+            <label for="reviewerEmail">EMAIL ADDRESS:</label>
+            <input type="email" id="reviewerEmail" placeholder="e.g., alex@example.com">
+            <span class="error-message" id="emailError"></span>
+          </div>
+
+          <!-- FEEDBACK TEXT -->
+          <div class="field-group">
+            <label for="reviewComments">YOUR COMMENTS:</label>
+            <textarea id="reviewComments" placeholder="Tell us what went well or how we can improve..."></textarea>
+            <span class="error-message" id="commentsError"></span>
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <div class="button-wrapper">
+            <button type="submit" class="btn-submit">Submit Review</button>
+          </div>
+
+          <div id="successMessage" class="success-message"></div>
+
+        </form>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    function toggleTag(element) {
+      element.classList.toggle('selected');
+    }
+
+    async function submitReview(event) {
+  event.preventDefault();
+
+  const ratingSelected = document.querySelector('input[name="rating"]:checked');
+  const name = document.getElementById('reviewerName').value.trim();
+  const email = document.getElementById('reviewerEmail').value.trim();
+  const comments = document.getElementById('reviewComments').value.trim();
+
+  document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+  const successMsg = document.getElementById('successMessage');
+
+  let isValid = true;
+  if (!ratingSelected) { document.getElementById('ratingError').textContent = 'Please select a rating.'; isValid = false; }
+  if (!name) { document.getElementById('nameError').textContent = 'Name is required.'; isValid = false; }
+  if (!email) { document.getElementById('emailError').textContent = 'Email is required.'; isValid = false; }
+  if (!comments) { document.getElementById('commentsError').textContent = 'Comment is required.'; isValid = false; }
+
+  if (!isValid) return;
+
+  const selectedTags = Array.from(document.querySelectorAll('.tag-pill.selected'))
+                            .map(tag => tag.textContent);
+
+  try {
+    const response = await fetch('http://localhost:3000/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rating: Number(ratingSelected.value),
+        tags: selectedTags,
+        name,
+        email,
+        comments
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      successMsg.textContent = 'Thank you! Your review has been saved.';
+      document.getElementById('reviewForm').reset();
+      document.querySelectorAll('.tag-pill').forEach(tag => tag.classList.remove('selected'));
+    } else {
+      alert(data.message || 'Failed to submit review.');
+    }
+  } catch (err) {
+    alert('Server connection error.');
+  }
+}
+
+  </script>
+</body>
+</html>

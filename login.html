@@ -1,0 +1,99 @@
+<!DOCTYPE html><!--Declares the document type as HTML5 to ensure proper browser rendering.Without it, the browser may switch to Quirks Mode, where it tries to imitate very old browsers. This can cause layouts, fonts, spacing, and CSS to behave unexpectedly.-->
+<html lang="en"> <!--Opens the root HTML element and sets the document language to English.-->
+<head> <!--Opens the head section containing document metadata(Metadata is "data about data." It provides information about a webpage or document rather than being the main content that users see.), title, and stylesheets.-->
+  <meta charset="UTF-8"><!-- Specifies the character encoding for the HTML document -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- Ensures the page is responsive and scales correctly on different devices,name is a label that tells the software,"this meta data is about....",viewport:the visible area of the webpage,content attribute contains settings for the viewport,initial scale contains the initial zoom level -->
+  <title>LifeLink - Donor Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { display: flex; background-color: maroon; color: #000000; min-height: 100vh; overflow-x: hidden; }
+    .sidebar { width: 260px; background-color: #ffffff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+    .sidebar-header { padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e0e0; }
+    .nav-list { list-style: none; padding: 10px 0; flex: 1; }
+    .nav-item a { display: flex; align-items: center; padding: 14px 20px; color: #000000; text-decoration: none; font-weight: 500; }
+    .nav-item a:hover, .nav-item.active a { background-color: maroon; color: white; }
+    .nav-icon { margin-right: 15px; font-size: 1.2rem; }
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; }
+    .top-banner { background-color: #ffffff; border-bottom: 2px solid #000000; padding: 20px 40px; text-align: center; }
+    .content-container { padding: 40px 20px; display: flex; justify-content: center; align-items: center; flex: 1; }
+    .card { border: 2px solid #000000; background-color: #FAF0E6; width: 380px; padding: 28px; border-radius: 30px; box-shadow: 5px 10px #000000; }
+    .card h2 { text-align: center; margin-bottom: 20px; }
+    .field-group { display: flex; flex-direction: column; margin-bottom: 14px; }
+    .field-group label { font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+    .field-group input { background-color: #ffffff; border: 1px solid #000000; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+    .button-wrapper { display: flex; justify-content: center; margin-top: 15px; }
+    .btn-submit { background-color: #F3E2D3; font-weight: bold; border: 1.5px solid #000000; padding: 8px 24px; border-radius: 8px; cursor: pointer; }
+    .btn-submit:hover { background-color: #000000; color: #ffffff; }
+    .error-msg { color: #d9534f; font-size: 12px; text-align: center; margin-top: 10px; }
+  </style><!--CSS block-->
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header"><span style="font-weight: 700;">LifeLink</span></div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item active"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-banner"><h1>LifeLink 🩸</h1></header>
+    <main class="content-container">
+      <div class="card">
+        <h2>DONOR LOGIN</h2>
+        <form id="loginForm">
+          <div class="field-group">
+            <label for="contact">CONTACT NUMBER:</label>
+            <input type="tel" id="contact" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="field-group">
+            <label for="password">PASSWORD:</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+          </div>
+          <div class="button-wrapper">
+            <button type="submit" class="btn-submit">Login</button>
+          </div>
+          <div id="errorMsg" class="error-msg"></div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const contact = document.getElementById('contact').value.trim();
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
+
+      try {
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('currentDonorId', data.donor.id);
+          alert('Logged in successfully!');
+        } else {
+          errorMsg.textContent = data.message || 'Login failed.';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Server error. Ensure server.js is running.';
+      }
+    });
+  </script>
+</body>
+</html>

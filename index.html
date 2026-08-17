@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Emergency Blood Request & Donor Finder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: maroon;
+      color: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color:maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN CONTENT AREA --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* MAIN CONTENT CONTAINER */
+    .content-container {
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    /* HERO CARD */
+    .hero-card {
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 35px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    .hero-card p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .action-btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      color: #000000;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background-color: #000000;
+      color: #ffffff;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    /* HORIZONTAL CARDS CONTAINER */
+    .cards-scroll-container {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 10px 5px 20px 5px;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;  /* IE/Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    .cards-scroll-container::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    /* CARD COMPONENT */
+    .info-card {
+      flex: 0 0 auto;
+      width: 320px;
+      min-height: 280px;
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 24px;
+      color: #000000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .info-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+
+    .stat-item, .step-item, .testimonial-item {
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px dashed #000000;
+      margin: 10px 0;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item active"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <!-- HERO CARD -->
+      <section class="hero-card">
+        <h2>❤️ Every Drop Counts</h2>
+        <p>
+          Connecting Blood Donors with People Who Need Them Most.<br>
+          Find verified donors instantly, locate nearby blood banks, or raise an emergency blood request.
+        </p>
+        <div class="btn-group">
+          <button class="action-btn"><a href="donors.html" style="text-decoration: none; color: inherit;">Find Donor</a></button>
+          <button class="action-btn"><a href="register.html" style="text-decoration: none; color: inherit;">Become a Donor</a></button>
+        </div>
+      </section>
+
+      <!-- HORIZONTAL SCROLL CARDS -->
+      <section class="cards-scroll-container">
+
+        <!-- CARD 1: PLATFORM STATS -->
+        <div class="info-card">
+          <div>
+            <h3>Platform Overview</h3>
+            <div class="stat-item">
+              <div class="stat-number">❤️ 5,000+</div>
+              <div>Registered Donors</div>
+            </div>
+            <hr class="divider">
+            <div class="stat-item">
+              <div class="stat-number">🏥 120+</div>
+              <div>Blood Banks</div>
+            </div>
+            <hr class="divider">
+            <div class="stat-item">
+              <div class="stat-number">🚑 350+</div>
+              <div>Emergency Requests</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: BLOOD AVAILABILITY -->
+        <div class="info-card">
+          <div>
+            <h3>🩸 8 Blood Groups Available</h3>
+            <div class="grid-2col" style="margin-top: 15px;">
+              <div><strong>A+</strong> 250 Available</div>
+              <div><strong>A-</strong> 85 Available</div>
+              <div><strong>B+</strong> 190 Available</div>
+              <div><strong>B-</strong> 60 Available</div>
+              <div><strong>O+</strong> 420 Available</div>
+              <div><strong>O-</strong> 75 Available</div>
+              <div><strong>AB+</strong> 110 Available</div>
+              <div><strong>AB-</strong> 30 Available</div>
+            </div>
+          </div>
+        </div>
+
+        
+        <!-- CARD 4: TESTIMONIALS -->
+        <div class="info-card">
+          <div>
+            <h3>User Stories</h3>
+            <div class="testimonial-item">
+              <p>❤️ "I donated blood and helped save a newborn."</p>
+              <small>— Priya, Bengaluru</small>
+            </div>
+            <hr class="divider">
+            <div class="testimonial-item">
+              <p>❤️ "LifeLink helped us find O-negative blood within 20 minutes."</p>
+              <small>— Family of Rohan</small>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Blood Banks in Bengaluru</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: maroon;
+      color: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color: maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* CONTENT CONTAINER */
+    .content-container {
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .page-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* SEARCH & FILTER BAR */
+    .search-box {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 2px solid #000000;
+      border-radius: 6px;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+    }
+
+    /* BLOOD BANK GRID (CSS GRID) */
+    .bank-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    /* CARD STYLING */
+    .bank-card {
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .bank-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .bank-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .bank-area {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid #000000;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .bank-info {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .bank-info div {
+      margin-bottom: 6px;
+    }
+
+    .availability-tag {
+      font-size: 0.85rem;
+      background-color: #f0f0f0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border-left: 3px solid #000000;
+      margin-bottom: 15px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 2px solid #000000;
+      background-color: #ffffff;
+      color: #000000;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background-color: #000000;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      font-size: 1.1rem;
+      border: 2px dashed #000000;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item active"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <div class="page-title">
+        <h2 style="color: white;">🏥 Blood Banks in Bengaluru</h2>
+        <span style="font-size: 0.9rem; font-weight: 600; color: white;">Location Scope: Bengaluru City Only</span>
+      </div>
+
+      <!-- SEARCH BAR -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search by hospital name or area (e.g., Jayanagar, Whitefield, NIMHANS)..."
+          onkeyup="filterBloodbanks()"
+        >
+      </div>
+
+      <!-- BLOOD BANK GRID -->
+      <div class="bank-grid" id="bankGrid">
+
+        <!-- BANK 1 -->
+        <div class="bank-card" data-name="Rotary TTK Blood Bank" data-area="Jayanagar">
+          <div>
+            <h3>Rotary TTK Blood Bank</h3>
+            <span class="bank-area">Jayanagar</span>
+            <div class="bank-info">
+              <div>📍 New Thippasandra Main Rd / Jayanagar 3rd Block</div>
+              <div>📞 +91 080 2528 1104</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> A+, O+, B+, AB+ available
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- BANK 2 -->
+        <div class="bank-card" data-name="BMCRI Lions Blood Bank Victoria Hospital" data-area="KR Market Fort">
+          <div>
+            <h3>BMCRI Lions Blood Bank</h3>
+            <span class="bank-area">Victoria Hospital / Fort</span>
+            <div class="bank-info">
+              <div>📍 Victoria Hospital Campus, Fort Road</div>
+              <div>📞 +91 080 2670 1150</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> All major blood groups & platelets
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- BANK 3 -->
+        <div class="bank-card" data-name="NIMHANS Blood Bank" data-area="Hosur Road City">
+          <div>
+            <h3>NIMHANS Blood Bank</h3>
+            <span class="bank-area">Hosur Road</span>
+            <div class="bank-info">
+              <div>📍 NIMHANS Campus, Hosur Road</div>
+              <div>📞 +91 080 2699 5000</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> O-, A-, B+ currently critical
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- BANK 4 -->
+        <div class="bank-card" data-name="Manipal Hospital Blood Centre" data-area="HAL Airport Road Indiranagar">
+          <div>
+            <h3>Manipal Hospital Centre</h3>
+            <span class="bank-area">HAL Airport Road</span>
+            <div class="bank-info">
+              <div>📍 98 HAL Airport Road, Kodihalli</div>
+              <div>📞 +91 080 2502 4444</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> AB-, O+, A+ available
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- BANK 5 -->
+        <div class="bank-card" data-name="Rashtrotthana Blood Centre" data-area="Gavipuram Kempegowda Nagar">
+          <div>
+            <h3>Rashtrotthana Blood Centre</h3>
+            <span class="bank-area">KG Nagar</span>
+            <div class="bank-info">
+              <div>📍 Bull Temple Road, Gavipuram</div>
+              <div>📞 +91 080 2661 2730</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> Rare negative groups stocked
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- BANK 6 -->
+        <div class="bank-card" data-name="Narayana Health Blood Bank" data-area="Bommasandra Electronic City">
+          <div>
+            <h3>Narayana Health Blood Bank</h3>
+            <span class="bank-area">Electronic City</span>
+            <div class="bank-info">
+              <div>📍 258/A, Bommasandra Industrial Area</div>
+              <div>📞 +91 080 7122 2222</div>
+              <div>🕒 Open 24/7</div>
+            </div>
+            <div class="availability-tag">
+              <strong>Stock:</strong> Plasma, RBC & Whole Blood
+            </div>
+          </div>
+          <button class="action-btn">Contact Blood Bank</button>
+        </div>
+
+        <!-- NO RESULTS MESSAGE -->
+        <div class="no-results" id="noResults">
+          No blood banks in Bengaluru match your search criteria.
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    function filterBloodbanks() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.bank-card');
+      const noResults = document.getElementById('noResults');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        const area = card.getAttribute('data-area').toLowerCase();
+
+        if (name.includes(input) || area.includes(input)) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>

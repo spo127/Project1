@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - About Us</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: #800000; /* Maroon background */
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color: maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      color: #000000;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* PAGE CONTENT AREA */
+    .content-container {
+      padding: 50px 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #ffffff;
+      padding-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .tagline {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #ffd7d7;
+      margin-bottom: 40px;
+    }
+
+    .section-block {
+      margin-bottom: 35px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #FAF0E6;
+    }
+
+    .about-text {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #f5f5f5;
+    }
+
+    .feature-list {
+      margin-top: 10px;
+      padding-left: 24px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #f5f5f5;
+    }
+
+    .feature-list li {
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .content-container {
+        padding: 30px 20px;
+      }
+      .page-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700; color: #000;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item active"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>
+      
+    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <h1 class="page-title">ABOUT LIFELINK</h1>
+      <p class="tagline">Connecting Donors, Saving Lives in Real Time.</p>
+
+      <div class="section-block">
+        <h2 class="section-title">Our Mission</h2>
+        <p class="about-text">
+          LifeLink is a community-driven emergency blood donation platform dedicated to bridging the critical gap between voluntary blood donors, blood banks, and patients facing urgent medical emergencies.
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">What We Do</h2>
+        <ul class="feature-list">
+          <li><strong>Instant Emergency Requests:</strong> Broadcast urgent blood requests to active local donors without delay.</li>
+          <li><strong>Verified Donor Directory:</strong> Maintain an organized, real-time database of ready and accessible donors.</li>
+          <li><strong>Blood Bank Search:</strong> Enable quick lookup of nearby authorized blood storage centers.</li>
+          <li><strong>24/7 AI Assistance:</strong> Provide round-the-clock guidance to assist users during high-stress critical situations.</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Our Vision</h2>
+        <p class="about-text">
+          We envision a seamless, tech-enabled healthcare community where no life is compromised due to a delay in discovering compatible, life-saving blood supplies.
+        </p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+  </script>
+</body>
+</html>

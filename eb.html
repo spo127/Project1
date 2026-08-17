@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Emergency Blood Request</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: maroon;
+      color: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color:maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* CONTENT CONTAINER */
+    .content-container {
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    /* TWO-COLUMN GRID SETUP */
+    .grid-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* FORM CARD STYLING */
+    .form-card {
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border: 2px solid #000000;
+      border-radius: 6px;
+      background-color: #ffffff;
+      outline: none;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: 2px solid #000000;
+      background-color: #000000;
+      color: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      background-color: #333333;
+      transform: translateY(-2px);
+    }
+
+    /* ACTIVE REQUESTS STYLING */
+    .requests-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .request-card {
+      background-color: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .request-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+
+    .blood-badge {
+      background-color: #000000;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid #000000;
+      background-color: #f0f0f0;
+      color: #000000;
+    }
+
+    .status-pill.status-fulfilled {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .status-pill.status-cancelled {
+      background-color: #e0e0e0;
+      color: #555555;
+      border-style: dashed;
+    }
+
+    .request-body {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1.5px solid #000000;
+      background-color: #ffffff;
+      color: #000000;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-action:hover {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .btn-cancel {
+      border-color: #000000;
+      background-color: #f0f0f0;
+    }
+
+    .btn-delete {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .btn-delete:hover {
+      background-color: #333333;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item active"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <div class="grid-split">
+
+        <!-- LEFT COLUMN: CREATE REQUEST FORM -->
+        <div class="form-card">
+          <h2>🚨 Post Emergency Request</h2>
+          <form id="emergencyForm" onsubmit="handleRequestSubmit(event)">
+            
+            <div class="form-group">
+              <label for="bloodGroup">Required Blood Group *</label>
+              <select id="bloodGroup" class="form-control" required>
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="units">Required Quantity (Units) *</label>
+              <input type="number" id="units" class="form-control" min="1" max="10" required placeholder="e.g. 2">
+            </div>
+
+            <div class="form-group">
+              <label for="hospital">Hospital & Room Info *</label>
+              <input type="text" id="hospital" class="form-control" required placeholder="e.g., Manipal Hospital, ICU Bed 12">
+            </div>
+
+            <div class="form-group">
+              <label for="location">City / Location *</label>
+              <input type="text" id="location" class="form-control" required placeholder="e.g., HAL Airport Road, Bengaluru">
+            </div>
+
+            <div class="form-group">
+              <label for="contact">Emergency Contact Number *</label>
+              <input type="tel" id="contact" class="form-control" required placeholder="+91 98765 43210">
+            </div>
+
+            <div class="form-group">
+              <label for="description">Emergency Description</label>
+              <textarea id="description" class="form-control" placeholder="Provide context (e.g., Surgery scheduled in 2 hours)..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Post Emergency Request</button>
+          </form>
+        </div>
+
+        <!-- RIGHT COLUMN: ACTIVE REQUESTS LISTING -->
+        <div>
+          <h2 style="font-size: 1.5rem; color: white; margin-bottom: 20px; border-bottom: 2px solid #f6f2f2; padding-bottom: 8px;">
+            📋 Active Emergency Requests
+          </h2>
+
+          <div class="requests-container" id="requestsList">
+
+            <!-- REQUEST 1 -->
+            <div class="request-card">
+              <div>
+                <div class="request-header">
+                  <span class="blood-badge">O- (3 Units)</span>
+                  <span class="status-pill">Pending</span>
+                </div>
+                <div class="request-body">
+                  <div>🏥 <strong>Hospital:</strong> Victoria Hospital, Ward 4</div>
+                  <div>📍 <strong>Location:</strong> KR Market, Bengaluru</div>
+                  <div>📞 <strong>Contact:</strong> +91 98112 23344</div>
+                  <div>📝 <strong>Details:</strong> Urgent need for trauma patient. Immediate response required.</div>
+                </div>
+              </div>
+              <div class="btn-action-group">
+                <button class="btn-action" onclick="alert('Contacting requester...')">Respond</button>
+                <button class="btn-action btn-fulfill" onclick="toggleFulfill(this)">Fulfill</button>
+                <button class="btn-action btn-cancel" onclick="toggleCancel(this)">Cancel</button>
+                <button class="btn-action btn-delete" onclick="deleteRequest(this)">Delete</button>
+              </div>
+            </div>
+
+            <!-- REQUEST 2 -->
+            <div class="request-card">
+              <div>
+                <div class="request-header">
+                  <span class="blood-badge">AB- (1 Unit)</span>
+                  <span class="status-pill">Pending</span>
+                </div>
+                <div class="request-body">
+                  <div>🏥 <strong>Hospital:</strong> Fortis Hospital, Room 302</div>
+                  <div>📍 <strong>Location:</strong> Bannerghatta Road, Bengaluru</div>
+                  <div>📞 <strong>Contact:</strong> +91 97445 66778</div>
+                  <div>📝 <strong>Details:</strong> Scheduled heart surgery tomorrow morning.</div>
+                </div>
+              </div>
+              <div class="btn-action-group">
+                <button class="btn-action" onclick="alert('Contacting requester...')">Respond</button>
+                <button class="btn-action btn-fulfill" onclick="toggleFulfill(this)">Fulfill</button>
+                <button class="btn-action btn-cancel" onclick="toggleCancel(this)">Cancel</button>
+                <button class="btn-action btn-delete" onclick="deleteRequest(this)">Delete</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    function handleRequestSubmit(e) {
+      e.preventDefault();
+
+      const bg = document.getElementById('bloodGroup').value;
+      const units = document.getElementById('units').value;
+      const hospital = document.getElementById('hospital').value;
+      const location = document.getElementById('location').value;
+      const contact = document.getElementById('contact').value;
+      const desc = document.getElementById('description').value;
+
+      const newRequestHTML = `
+        <div class="request-card">
+          <div>
+            <div class="request-header">
+              <span class="blood-badge">${bg} (${units} Units)</span>
+              <span class="status-pill">Pending</span>
+            </div>
+            <div class="request-body">
+              <div>🏥 <strong>Hospital:</strong> ${hospital}</div>
+              <div>📍 <strong>Location:</strong> ${location}</div>
+              <div>📞 <strong>Contact:</strong> ${contact}</div>
+              <div>📝 <strong>Details:</strong> ${desc || 'No additional details provided.'}</div>
+            </div>
+          </div>
+          <div class="btn-action-group">
+            <button class="btn-action" onclick="alert('Contacting requester...')">Respond</button>
+            <button class="btn-action btn-fulfill" onclick="toggleFulfill(this)">Fulfill</button>
+            <button class="btn-action btn-cancel" onclick="toggleCancel(this)">Cancel</button>
+            <button class="btn-action btn-delete" onclick="deleteRequest(this)">Delete</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('requestsList').insertAdjacentHTML('afterbegin', newRequestHTML);
+      document.getElementById('emergencyForm').reset();
+    }
+
+    function toggleFulfill(btnElement) {
+      const card = btnElement.closest('.request-card');
+      const statusPill = card.querySelector('.status-pill');
+      const cancelBtn = card.querySelector('.btn-cancel');
+
+      if (statusPill.innerText !== 'Fulfilled') {
+        statusPill.innerText = 'Fulfilled';
+        statusPill.className = 'status-pill status-fulfilled';
+        btnElement.innerText = 'Reopen';
+        cancelBtn.style.display = 'none';
+      } else {
+        statusPill.innerText = 'Pending';
+        statusPill.className = 'status-pill';
+        btnElement.innerText = 'Fulfill';
+        cancelBtn.style.display = 'inline-block';
+      }
+    }
+
+    function toggleCancel(btnElement) {
+      const card = btnElement.closest('.request-card');
+      const statusPill = card.querySelector('.status-pill');
+      const fulfillBtn = card.querySelector('.btn-fulfill');
+
+      if (statusPill.innerText !== 'Cancelled') {
+        statusPill.innerText = 'Cancelled';
+        statusPill.className = 'status-pill status-cancelled';
+        btnElement.innerText = 'Reopen';
+        fulfillBtn.style.display = 'none';
+      } else {
+        statusPill.innerText = 'Pending';
+        statusPill.className = 'status-pill';
+        btnElement.innerText = 'Cancel';
+        fulfillBtn.style.display = 'inline-block';
+      }
+    }
+
+    function deleteRequest(btnElement) {
+      const card = btnElement.closest('.request-card');
+      if (confirm('Are you sure you want to permanently delete this emergency request?')) {
+        card.remove();
+      }
+    }
+    
+  </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink - Contact Us</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      background-color: #800000; /* Maroon background */
+      color: #000000;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- DASHBOARD SIDEBAR --- */
+    .sidebar {
+      width: 260px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid #000000;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      color: #000000;
+      text-decoration: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .nav-item a:hover, .nav-item.active a {
+      background-color: maroon;
+      color: white;
+      padding-left: 25px;
+    }
+
+    .nav-icon {
+      margin-right: 15px;
+      font-size: 1.2rem;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .brand-name {
+      display: none;
+    }
+
+    /* --- MAIN WRAPPER --- */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: calc(100% - 260px);
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background-color: #ffffff;
+      border-bottom: 2px solid #000000;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .top-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* CONTENT CONTAINER */
+    .content-container {
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+    }
+
+    /* CARD STYLING & HOVER EFFECT */
+    .card {
+      border: 2px solid #000000;
+      background-color: #FAF0E6;
+      width: 400px;
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 5px 10px #000000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+    .card:hover {
+      background-color: #FFFFFF;
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 8px 18px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .card h2 {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 1.6rem;
+    }
+
+    /* CONTACT LIST STYLING */
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+      border: 1.5px solid #000000;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #000000;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .contact-item:hover {
+      background-color: #F3E2D3;
+      transform: translateX(5px);
+    }
+
+    .contact-icon {
+      font-size: 1.4rem;
+      margin-right: 14px;
+      min-width: 25px;
+      text-align: center;
+    }
+
+    .contact-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contact-label {
+      font-size: 0.75rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .contact-value {
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DASHBOARD SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-name" style="font-weight: 700;">LifeLink</span>
+      <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav-list">
+<li class="nav-item"><a href="index.html"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></a></li>
+      <li class="nav-item"><a href="about.html"><span class="nav-icon">ℹ️</span><span class="nav-text">About us</span></a></li>
+      <li class="nav-item"><a href="login.html"><span class="nav-icon">🔑</span>Donor Login</a></li>
+      <li class="nav-item"><a href="register.html"><span class="nav-icon">✍️</span><span class="nav-text">Register as a Donor</span></a></li>
+      <li class="nav-item"><a href="donors.html"><span class="nav-icon">👥</span><span class="nav-text">Donors</span></a></li>
+      <li class="nav-item"><a href="bloodbanks.html"><span class="nav-icon">🏥</span><span class="nav-text">Bloodbanks</span></a></li>
+      <li class="nav-item"><a href="eb.html"><span class="nav-icon">🚨</span><span class="nav-text">Emergency blood request</span></a></li>
+      <li class="nav-item active"><a href="contact.html"><span class="nav-icon">📞</span><span class="nav-text">Contact us</span></a></li>
+      <li class="nav-item"><a href="reviews.html"><span class="nav-icon">⭐</span><span class="nav-text">Leave a review</span></a></li>
+      <li class="nav-item"><a href="ai-bot.html"><span class="nav-icon">🤖</span><span class="nav-text">24/7 Ai bot</span></a></li>    </ul>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    
+    <!-- TOP BANNER -->
+    <header class="top-banner">
+      <h1>LifeLink 🩸</h1>
+    </header>
+
+    <!-- CONTENT CONTAINER -->
+    <main class="content-container">
+
+      <!-- CONTACT CARD -->
+      <div class="card">
+        <h2>CONTACT US</h2>
+        
+        <div class="contact-list">
+
+          <!-- PHONE -->
+          <a  class="contact-item">
+            <span class="contact-icon">📞</span>
+            <div class="contact-details">
+              <span class="contact-label">Phone Number</span>
+              <span class="contact-value">+91 98765 43210</span>
+            </div>
+          </a>
+
+          <!-- EMAIL -->
+          <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl" class="contact-item">
+            <span class="contact-icon">✉️</span>
+            <div class="contact-details">
+              <span class="contact-label">Email Address</span>
+              <span class="contact-value">support@lifelink.com</span>
+            </div>
+          </a>
+
+          <!-- INSTAGRAM -->
+          <a href="https://instagram.com" target="_blank" class="contact-item">
+            <span class="contact-icon">📷</span>
+            <div class="contact-details">
+              <span class="contact-label">Instagram</span>
+              <span class="contact-value">@lifelink_official</span>
+            </div>
+          </a>
+
+          <!-- FACEBOOK -->
+          <a href="https://facebook.com" target="_blank" class="contact-item">
+            <span class="contact-icon">📘</span>
+            <div class="contact-details">
+              <span class="contact-label">Facebook</span>
+              <span class="contact-value">LifeLink Network</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+  </script>
+</body>
+</html>
