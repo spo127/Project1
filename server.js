@@ -9,6 +9,7 @@ const SECRET_KEY = 'lifelink_secret_key';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // MySQL Connection Pool
 const db = mysql.createPool({
